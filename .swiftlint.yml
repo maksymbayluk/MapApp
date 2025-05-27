@@ -1,0 +1,57 @@
+disabled_rules:
+  - todo
+  - force_cast
+  - force_unwrapping
+  - nesting
+
+opt_in_rules:
+  - closure_spacing
+  - empty_count
+  - explicit_init
+  - sorted_first_last
+  - trailing_closure
+
+included:
+  - SpaceX
+
+excluded:
+  - Pods
+  - Carthage
+  - Build
+  - Generated
+
+trailing_comma:
+  mandatory_comma: false
+
+trailing_whitespace:
+  ignores_empty_lines: true
+  ignores_comments: true
+
+vertical_whitespace:
+  max_empty_lines: 1
+
+opening_brace:
+  severity: warning
+
+line_length:
+  warning: 120
+  error: 160
+  ignores_comments: true
+  ignores_urls: true
+
+identifier_name:
+  allowed_symbols: "_"  # Add underscore to allowed symbols
+  validates_start_with_lowercase: error
+  min_length: 2
+  max_length: 40
+  excluded:
+    - id
+    - URL
+    - iOS
+
+empty_parameters:
+  severity: warning
+
+redundant_optional_initialization:
+  severity: warning
+
