@@ -19,8 +19,10 @@ final class AppCoordinator {
         let navController = UINavigationController()
         window.rootViewController = navController
         window.makeKeyAndVisible()
+        let locationService = LocationService()
+        locationService.requestAuthorization()
 
-        mainCoordinator = MainCoordinator(navigationController: navController)
+        mainCoordinator = MainCoordinator(navigationController: navController, locationService: locationService)
         mainCoordinator?.start()
     }
 }

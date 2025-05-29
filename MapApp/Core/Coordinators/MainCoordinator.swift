@@ -6,42 +6,53 @@
 //
 import UIKit
 
-final class MainCoordinator: SideMenuContainerDelegate {
+// MARK: - MainCoordinator
+
+class MainCoordinator: SideMenuContainerDelegate {
 
     private let navigationController: UINavigationController
     private var containerVC: SideMenuContainerViewController!
+    private let locationService: LocationService
 
-
-    init(navigationController: UINavigationController) {
+    init(navigationController: UINavigationController, locationService: LocationService) {
         self.navigationController = navigationController
+        self.locationService = locationService
     }
 
     func start() {
-        let mainMapVM = MainMapViewModel()
-        let mainMapVC = MainMapViewController()
+        let mainMapVC = makeViewController(for: .map)
         let sideMenuVC = SideMenuViewController()
         let sideMenuVM = SideMenuViewModel()
         sideMenuVC.viewModel = sideMenuVM
-        mainMapVC.viewModel = mainMapVM
-        containerVC = SideMenuContainerViewController(mainMapViewController: mainMapVC, sideMenuViewController: sideMenuVC)
+        containerVC = SideMenuContainerViewController(mainMapViewController: mainMapVC as! MainMapViewController, sideMenuViewController: sideMenuVC)
         containerVC.delegate = self
         navigationController.setViewControllers([containerVC], animated: false)
+        locationService.start()
     }
 
     func didSelectMenuOption(_ option: SideMenuOption) {
+        let vc = makeViewController(for: option)
+        containerVC.setContentViewController(vc)
+    }
+}
+
+extension MainCoordinator {
+    private func makeViewController(for option: SideMenuOption) -> UIViewController {
         switch option {
         case .map:
-            let mapVC = MainMapViewController()
-            mapVC.viewModel = MainMapViewModel()
-            containerVC.setContentViewController(mapVC)
+            let vm = MainMapViewModel(locationService: locationService)
+            let vc = MainMapViewController()
+            vc.viewModel = vm
+            return vc
 
         case .list:
-            let listVC = ListViewController()
-            containerVC.setContentViewController(listVC)
+            return ListViewController()
 
         case .info:
-            let infoVC = InfoViewController()
-            containerVC.setContentViewController(infoVC)
+            let vm = InfoViewModel(locationService: locationService)
+            let vc = InfoViewController()
+            vc.viewModel = vm
+            return vc
         }
     }
 }

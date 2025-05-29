@@ -6,8 +6,7 @@
 //
 import UIKit
 
-
-final class ListCoordinator {
+class ListCoordinator {
     private let navigationController: UINavigationController
 
     init(navigationController: UINavigationController) {

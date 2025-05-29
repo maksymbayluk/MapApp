@@ -4,25 +4,36 @@
 //
 //  Created by Максим Байлюк on 27.05.2025.
 //
+import CoreLocation
 import MapKit
 
 final class MainMapViewModel {
-
-    var onCenterMap: ((CLLocationCoordinate2D) -> Void)?
-    var didTapMenu: (() -> Void)?
     private let locationService: LocationService
+    var onUserLocationUpdated: ((CLLocationCoordinate2D) -> Void)?
+    var onLocationError: ((String) -> Void)?
+    var didTapMenu: (() -> Void)?
+    var currentCoordinates: CLLocationCoordinate2D? {
+        return locationService.lastLocation?.coordinate
+    }
 
-    init(locationService: LocationService = LocationService()) {
+    var totalDistance: CLLocationDistance? {
+        return locationService.totalDistance
+    }
+
+    init(locationService: LocationService) {
         self.locationService = locationService
+        setupBindings()
     }
 
-    func loadView() {
-        locationService.requestLocationPermission()
+    private func setupBindings() {
+        locationService.onError = { [weak self] error in
+            self?.onLocationError?(error.localizedDescription)
+        }
     }
 
-    func didTapMyLocation() {
-        locationService.getCurrentLocation { [weak self] coordinate in
-            self?.onCenterMap?(coordinate)
+    func centerUserLocation() {
+        locationService.requestCurrentLocation { [weak self] location in
+            self?.onUserLocationUpdated?(location.coordinate)
         }
     }
 }

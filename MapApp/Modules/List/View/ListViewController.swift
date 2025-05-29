@@ -4,10 +4,10 @@
 //
 //  Created by Максим Байлюк on 27.05.2025.
 //
-
 import UIKit
 
-class ListViewController: UIViewController {
+
+final class ListViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,3 +19,4 @@ class ListViewController: UIViewController {
         view.backgroundColor = .secondarySystemGroupedBackground
     }
 }
+

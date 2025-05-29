@@ -173,6 +173,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MapApp/Config/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MapApp;
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "We need your location to always track your position.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show your position on the map.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -207,6 +209,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MapApp/Config/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MapApp;
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "We need your location to always track your position.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show your position on the map.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

@@ -9,10 +9,8 @@ import MapKit
 import UIKit
 
 final class MainMapViewController: UIViewController {
-
     @IBOutlet weak var myLocation_btn: UIButton!
     @IBOutlet weak var mapView: MKMapView!
-
     var viewModel: MainMapViewModel?
     var didTapMenu: (() -> Void)?
 
@@ -27,8 +25,15 @@ final class MainMapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setUpMapView()
         bindViewModel()
-        viewModel?.loadView()
+    }
+
+    private func setUpMapView() {
+        mapView.showsUserLocation = true
+        mapView.overrideUserInterfaceStyle = .dark
+        mapView.setUserTrackingMode(.follow, animated: true)
+        setCurrentLocation()
     }
 
     private func setupUI() {
@@ -43,12 +48,28 @@ final class MainMapViewController: UIViewController {
         myLocation_btn.layer.shadowRadius = 4
     }
 
+    private func setCurrentLocation() {
+        if let coordinate = viewModel?.currentCoordinates {
+            let region = MKCoordinateRegion(
+                center: coordinate,
+                latitudinalMeters: 1000,
+                longitudinalMeters: 1000
+            )
+            mapView.setRegion(region, animated: true)
+        }
+    }
+
     private func bindViewModel() {
-        viewModel?.onCenterMap = { [weak self] coordinate in
-            guard let self = self else { return }
-            let region = MKCoordinateRegion(center: coordinate, latitudinalMeters: 500, longitudinalMeters: 500)
+        viewModel?.onUserLocationUpdated = { [weak self] coordinate in
+            guard let self else { return }
+            let region = MKCoordinateRegion(
+                center: viewModel?.currentCoordinates ?? coordinate,
+                latitudinalMeters: 1000,
+                longitudinalMeters: 1000
+            )
             self.mapView.setRegion(region, animated: true)
         }
+        viewModel?.onLocationError = { _ in }
         viewModel?.didTapMenu = { [weak self] in
             self?.didTapMenu?()
         }
@@ -59,7 +80,7 @@ final class MainMapViewController: UIViewController {
     }
 
     @IBAction func myLocationTapped(_: UIButton) {
-        viewModel?.didTapMyLocation()
+        viewModel?.centerUserLocation()
     }
 }
 

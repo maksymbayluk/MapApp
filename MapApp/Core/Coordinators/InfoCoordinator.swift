@@ -6,8 +6,7 @@
 //
 import UIKit
 
-
-final class InfoCoordinator {
+class InfoCoordinator {
     private let navigationController: UINavigationController
 
     init(navigationController: UINavigationController) {
