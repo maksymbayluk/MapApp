@@ -7,6 +7,8 @@
 import CoreLocation
 
 
+// MARK: - LocationService
+
 final class LocationService: NSObject {
     private let locationManager = CLLocationManager()
     private var oneTimeRequests: [(CLLocation) -> Void] = []
@@ -86,6 +88,8 @@ final class LocationService: NSObject {
         }
     }
 }
+
+// MARK: CLLocationManagerDelegate
 
 extension LocationService: CLLocationManagerDelegate {
     func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

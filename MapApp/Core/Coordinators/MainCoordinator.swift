@@ -46,7 +46,11 @@ extension MainCoordinator {
             return vc
 
         case .list:
-            return ListViewController()
+            let vc = PhotoListViewController()
+            let service = PhotoNetworkService()
+            let vm = PhotoListViewModel(service: service)
+            vc.viewModel = vm
+            return vc
 
         case .info:
             let vm = InfoViewModel(locationService: locationService)

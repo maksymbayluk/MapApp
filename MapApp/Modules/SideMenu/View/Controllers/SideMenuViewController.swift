@@ -16,6 +16,7 @@ protocol SideMenuContainerDelegate: AnyObject {
 // MARK: - SideMenuViewController
 
 class SideMenuViewController: UIViewController {
+    @IBOutlet weak var logoImageContainer: UIView!
     @IBOutlet weak var logoImageView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
@@ -33,6 +34,7 @@ class SideMenuViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setLogo()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -44,6 +46,20 @@ class SideMenuViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         tableView.removeObserver(self, forKeyPath: "contentSize")
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        logoImageView.layer.cornerRadius = logoImageView.bounds.width / 2
+        logoImageView.clipsToBounds = true
+        logoImageView.contentMode = .scaleAspectFill
+
+        logoImageContainer.layer.shadowColor = UIColor.black.cgColor
+        logoImageContainer.layer.shadowOpacity = 0.25
+        logoImageContainer.layer.shadowOffset = CGSize(width: 0, height: 2)
+        logoImageContainer.layer.shadowRadius = 4
+        logoImageContainer.layer.cornerRadius = logoImageContainer.bounds.width / 2
+        logoImageContainer.layer.masksToBounds = false
     }
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?) {
@@ -62,6 +78,12 @@ class SideMenuViewController: UIViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "side_menu_cell")
         tableView.isScrollEnabled = false
         tableView.reloadData()
+    }
+
+    func setLogo() {
+        if let image = UIImage(named: "map") {
+            logoImageView.image = image
+        }
     }
 }
 
