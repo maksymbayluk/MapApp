@@ -80,6 +80,7 @@ final class MainMapViewController: UIViewController {
     }
 
     @IBAction func myLocationTapped(_: UIButton) {
+        HapticManager.shared.impact(style: .heavy)
         viewModel?.centerUserLocation()
     }
 }

@@ -19,9 +19,17 @@
             </array>
         </dict>
     </dict>
+
     <key>UIBackgroundModes</key>
     <array>
         <string>location</string>
     </array>
+
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app uses your location to track distance.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>We are using your location even in the background to count distance.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Background location access is required for accurate distance counting.</string>
 </dict>
 </plist>

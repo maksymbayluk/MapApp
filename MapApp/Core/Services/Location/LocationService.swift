@@ -18,6 +18,7 @@ final class LocationService: NSObject {
     private var ignoreUpdatesAfterStopUntil: Date?
     private(set) var lastLocation: CLLocation?
     private var isTracking = false
+    static let shared = LocationService()
 
 
     override init() {
@@ -158,6 +159,9 @@ extension LocationService: CLLocationManagerDelegate {
 
         if distance > 3 && distance < 20 {
             totalDistance += distance
+            if Int(totalDistance) % 100 < Int(distance) {
+                NotificationService.shared.sendDistanceNotification(distance: totalDistance)
+            }
         }
     }
 
@@ -172,4 +176,21 @@ extension LocationService: CLLocationManagerDelegate {
     func locationManager(_: CLLocationManager, didFailWithError error: Error) {
         onError?(error)
     }
+
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        switch manager.authorizationStatus {
+        case .authorizedAlways,
+             .authorizedWhenInUse:
+            locationManager.allowsBackgroundLocationUpdates = true
+            locationManager.startUpdatingLocation()
+        case .denied,
+             .restricted:
+            AlertService.showAlert(title: "Location Access Denied", message: "Please enable location access in your device settings.")
+        default:
+            break
+        }
+    }
 }
+
+
+

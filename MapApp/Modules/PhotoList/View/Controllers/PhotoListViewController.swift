@@ -6,10 +6,20 @@
 //
 import UIKit
 
+// MARK: - PhotoListViewController
+
 class PhotoListViewController: UITableViewController {
 
     var viewModel: PhotoListViewModel?
     private var photoViewModels: [PhotoCellViewModel] = []
+
+    init() {
+        super.init(style: .insetGrouped)
+    }
+
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,7 +27,7 @@ class PhotoListViewController: UITableViewController {
         configureTableView()
         bindViewModel()
         Task {
-            await viewModel?.loadNextPage()
+            await self.viewModel?.loadNextPage()
         }
     }
 
@@ -38,8 +48,14 @@ class PhotoListViewController: UITableViewController {
             }
         }
 
-        viewModel?.onError = { error in
-            print("Error: \(error)")
+        viewModel?.onError = { [weak self] error in
+            DispatchQueue.main.async {
+                if self?.isInternetError(error) == true {
+                    self?.NoInternetMessage(shown: true)
+                } else {
+                    self?.NoInternetMessage(shown: false)
+                }
+            }
         }
 
         viewModel?.onLoadingStatusChanged = { [weak self] isLoading in
@@ -53,20 +69,34 @@ class PhotoListViewController: UITableViewController {
         }
     }
 
-    override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
+    override func numberOfSections(in _: UITableView) -> Int {
         return photoViewModels.count
     }
 
+    override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
+        return 1
+    }
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        viewModel?.loadNextPageIfNeeded(currentIndex: indexPath.row)
+        viewModel?.loadNextPageIfNeeded(currentIndex: indexPath.section)
 
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "PhotoCell", for: indexPath) as? PhotoTableViewCell else {
             return UITableViewCell()
         }
 
-        let vm = photoViewModels[indexPath.row]
+        let vm = photoViewModels[indexPath.section]
         cell.configure(with: vm)
         return cell
+    }
+
+    override func tableView(_: UITableView, heightForHeaderInSection _: Int) -> CGFloat {
+        return 10
+    }
+
+    override func tableView(_: UITableView, viewForHeaderInSection _: Int) -> UIView? {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
     }
 
     private func createSpinnerFooter() -> UIView {
@@ -76,6 +106,29 @@ class PhotoListViewController: UITableViewController {
         spinner.startAnimating()
         footerView.addSubview(spinner)
         return footerView
+    }
+
+    private func NoInternetMessage(shown: Bool) {
+        let label = UILabel()
+        label.text = "No Internet Connection"
+        label.textColor = .systemRed
+        label.textAlignment = .center
+        label.font = .boldSystemFont(ofSize: 16)
+        label.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: 50)
+        tableView.tableHeaderView = label
+        label.isHidden = !shown
+    }
+}
+
+extension PhotoListViewController {
+    private func isInternetError(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        let networkErrorCodes: [Int] = [
+            NSURLErrorNotConnectedToInternet,
+            NSURLErrorTimedOut,
+            NSURLErrorNetworkConnectionLost,
+        ]
+        return networkErrorCodes.contains(nsError.code)
     }
 }
 

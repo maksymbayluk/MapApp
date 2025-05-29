@@ -22,6 +22,9 @@ class PhotoTableViewCell: UITableViewCell {
         activityIndicator.stopAnimating()
         currentTask?.cancel()
         currentTask = nil
+        selectionStyle = .none
+        backgroundColor = .clear
+        contentView.backgroundColor = .secondarySystemGroupedBackground
     }
 
     func configure(with viewModel: PhotoCellViewModel) {
