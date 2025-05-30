@@ -8,8 +8,11 @@
 import MapKit
 import UIKit
 
+// MARK: - MainMapViewController
+
 final class MainMapViewController: UIViewController {
     @IBOutlet weak var myLocation_btn: UIButton!
+    @IBOutlet weak var navigateTo_btn: UIButton!
     @IBOutlet weak var mapView: MKMapView!
     var viewModel: MainMapViewModel?
     var didTapMenu: (() -> Void)?
@@ -24,28 +27,26 @@ final class MainMapViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
         setUpMapView()
         bindViewModel()
+        setupUI()
     }
 
     private func setUpMapView() {
         mapView.showsUserLocation = true
         mapView.overrideUserInterfaceStyle = .dark
-        mapView.setUserTrackingMode(.follow, animated: true)
-        setCurrentLocation()
     }
 
     private func setupUI() {
         title = "Map"
-        myLocation_btn.backgroundColor = .white
-        myLocation_btn.setImage(UIImage(systemName: "location.fill"), for: .normal)
-        myLocation_btn.layer.cornerRadius = myLocation_btn.bounds.width / 2
-        myLocation_btn.layer.masksToBounds = true
-        myLocation_btn.layer.shadowColor = UIColor.black.cgColor
-        myLocation_btn.layer.shadowOpacity = 0.3
-        myLocation_btn.layer.shadowOffset = CGSize(width: 0, height: 2)
-        myLocation_btn.layer.shadowRadius = 4
+        configureButton(myLocation_btn, imageName: "location.fill", color: .white)
+        configureButton(navigateTo_btn, imageName: "arrow.triangle.turn.up.right.diamond.fill", color: .white)
+        updateLocationDependentUI(status: LocationService.shared.authorizationStatus)
+        LocationService.shared.onAuthorizationChanged = { [weak self] status in
+            DispatchQueue.main.async {
+                self?.updateLocationDependentUI(status: status)
+            }
+        }
     }
 
     private func setCurrentLocation() {
@@ -82,6 +83,31 @@ final class MainMapViewController: UIViewController {
     @IBAction func myLocationTapped(_: UIButton) {
         HapticManager.shared.impact(style: .heavy)
         viewModel?.centerUserLocation()
+    }
+
+    @IBAction func navigateToTapped(_: UIButton) {
+        HapticManager.shared.impact(style: .heavy)
+        NavigationService.shared.openNavigationToCityCenter()
+    }
+}
+
+extension MainMapViewController {
+
+    private func configureButton(_ button: UIButton, imageName: String, color: UIColor) {
+        button.backgroundColor = color
+        button.setImage(UIImage(systemName: imageName), for: .normal)
+        button.layer.cornerRadius = button.bounds.width / 2
+        button.layer.masksToBounds = true
+    }
+
+    func updateLocationDependentUI(status: CLAuthorizationStatus) {
+        let isAuthorized = (status == .authorizedAlways || status == .authorizedWhenInUse)
+        myLocation_btn.alpha = isAuthorized ? 1.0 : 0
+        navigateTo_btn.alpha = isAuthorized ? 1.0 : 0
+        if isAuthorized {
+            mapView.setUserTrackingMode(.follow, animated: true)
+            setCurrentLocation()
+        }
     }
 }
 

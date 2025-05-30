@@ -22,7 +22,6 @@ class InfoViewController: UIViewController {
 
     private func setupUI() {
         title = "Info"
-        view.backgroundColor = .secondarySystemGroupedBackground
     }
 
     private func bindViewModel(completion: (() -> Void)? = nil) {

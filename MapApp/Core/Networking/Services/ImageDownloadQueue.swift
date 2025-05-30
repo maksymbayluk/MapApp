@@ -10,8 +10,6 @@ import Foundation
 
 let imageDownloadQueue = ImageDownloadQueue()
 
-// MARK: - ImageDownloadQueue
-
 actor ImageDownloadQueue {
     private var queue: [() async -> Void] = []
     private var isProcessing = false

@@ -13,6 +13,7 @@
             <connections>
                 <outlet property="mapView" destination="HWt-h6-8hW" id="1oQ-BN-8Us"/>
                 <outlet property="myLocation_btn" destination="94W-ed-Wan" id="iKl-oT-4OO"/>
+                <outlet property="navigateTo_btn" destination="8L3-dZ-NEZ" id="Edr-q5-5JW"/>
                 <outlet property="view" destination="iN0-l3-epB" id="TWC-jX-v59"/>
             </connections>
         </placeholder>
@@ -37,6 +38,19 @@
                         <action selector="myLocationTapped:" destination="-1" eventType="touchUpInside" id="i6X-e5-nXW"/>
                     </connections>
                 </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8L3-dZ-NEZ">
+                    <rect key="frame" x="281" y="594" width="80" height="80"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="80" id="3zG-Nk-juU"/>
+                        <constraint firstAttribute="width" constant="80" id="bEq-HC-eTO"/>
+                    </constraints>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="plain"/>
+                    <connections>
+                        <action selector="myLocationTapped:" destination="-1" eventType="touchUpInside" id="Mkz-ec-OS1"/>
+                        <action selector="navigateToTapped:" destination="-1" eventType="touchUpInside" id="lOX-DW-UKV"/>
+                    </connections>
+                </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemGroupedBackgroundColor"/>
@@ -46,6 +60,8 @@
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="94W-ed-Wan" secondAttribute="bottom" constant="32" id="92H-nT-kic"/>
                 <constraint firstAttribute="trailing" secondItem="HWt-h6-8hW" secondAttribute="trailing" id="M2Z-JH-fGd"/>
                 <constraint firstItem="HWt-h6-8hW" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Q8U-dn-FJP"/>
+                <constraint firstItem="94W-ed-Wan" firstAttribute="top" secondItem="8L3-dZ-NEZ" secondAttribute="bottom" constant="32" id="djB-hs-qJH"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="8L3-dZ-NEZ" secondAttribute="trailing" constant="32" id="obp-dd-MPW"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="94W-ed-Wan" secondAttribute="trailing" constant="32" id="tYz-qV-mCT"/>
             </constraints>
             <point key="canvasLocation" x="-45" y="20"/>

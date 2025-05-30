@@ -6,29 +6,7 @@
 //
 import Foundation
 
-//
-//enum PhotoEndpoint {
-//    case photos
-//
-//    private static let baseURL = URL(string: "https://picsum.photos")!
-//
-//    var url: URL? {
-//        switch self {
-//        case .photos:
-//            return Self.baseURL.appendingPathComponent("/v2/list")
-//        }
-//    }
-//
-//    func urlRequest() throws -> URLRequest {
-//        guard let url = url else {
-//            throw NetworkError.invalidURL
-//        }
-//
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "GET"
-//        return request
-//    }
-//}
+
 enum PhotoEndpoint {
     case photos(page: Int, limit: Int)
 

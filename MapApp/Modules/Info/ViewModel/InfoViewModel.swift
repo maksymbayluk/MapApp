@@ -31,16 +31,29 @@ final class InfoViewModel {
     }
 
     private func updateInfo(location: CLLocation? = nil, speed: Double? = nil) {
-        if let location = location { lastLocation = location }
-        if let speed = speed { lastSpeed = speed }
+        if let location = location {
+            lastLocation = location
+        }
+        if let speed = speed {
+            lastSpeed = speed
+        }
 
         guard let location = lastLocation else { return }
 
         let lat = String(format: "%.6f", location.coordinate.latitude)
         let lon = String(format: "%.6f", location.coordinate.longitude)
+
         let speedKmh = max(0, lastSpeed) * 3.6
-        let speedString = String(format: "%.2f km/h", speedKmh)
-        let distanceString = String(format: "%.2f m", locationService.totalDistance)
+        let speedString = String(format: "%.0f km/h", speedKmh)
+
+        let distance = locationService.totalDistance
+        let distanceString: String
+        if distance < 1000 {
+            distanceString = String(format: "%.0f m", distance)
+        } else {
+            distanceString = String(format: "%.2f km", distance / 1000)
+        }
+
         onInfoUpdate?("\(lat), \(lon)", speedString, distanceString)
     }
 }

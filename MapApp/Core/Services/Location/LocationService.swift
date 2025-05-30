@@ -18,7 +18,14 @@ final class LocationService: NSObject {
     private var ignoreUpdatesAfterStopUntil: Date?
     private(set) var lastLocation: CLLocation?
     private var isTracking = false
+    private(set) var authorizationStatus: CLAuthorizationStatus = .notDetermined {
+        didSet {
+            onAuthorizationChanged?(authorizationStatus)
+        }
+    }
+
     static let shared = LocationService()
+    var onAuthorizationChanged: ((CLAuthorizationStatus) -> Void)?
 
 
     override init() {
@@ -178,6 +185,8 @@ extension LocationService: CLLocationManagerDelegate {
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        let status = manager.authorizationStatus
+        authorizationStatus = status
         switch manager.authorizationStatus {
         case .authorizedAlways,
              .authorizedWhenInUse:
