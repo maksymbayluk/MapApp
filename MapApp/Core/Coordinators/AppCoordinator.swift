@@ -14,7 +14,7 @@ final class AppCoordinator {
     init(window: UIWindow) {
         self.window = window
     }
-
+    //Start of the navigation and requesting permissions
     func start() {
         let navController = UINavigationController()
         window.rootViewController = navController

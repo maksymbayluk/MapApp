@@ -8,7 +8,7 @@
 import UIKit
 
 enum AlertService {
-
+    //method to present alert
     static func showAlert(
         title: String,
         message: String,
@@ -27,7 +27,7 @@ enum AlertService {
         }
     }
 
-    // MARK: - Helper to find top most view controller
+    //Helper to find top most view controller
     private static func topViewController(
         _ rootViewController: UIViewController? = UIApplication.shared.connectedScenes
             .compactMap { ($0 as? UIWindowScene)?.keyWindow }

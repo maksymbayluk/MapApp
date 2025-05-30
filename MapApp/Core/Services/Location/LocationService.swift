@@ -7,24 +7,33 @@
 import CoreLocation
 
 
-// MARK: - LocationService
-
+//Singleton class responsible for managing location updates. It handles authorization, starts and stops location tracking, processes location updates, calculates distance, and notifies subscribers(map and info) about location and speed changes.
 final class LocationService: NSObject {
     private let locationManager = CLLocationManager()
+    //A list of closures to call once when updated (map)
     private var oneTimeRequests: [(CLLocation) -> Void] = []
+    //A list of closures that get notified continuously
     private var subscribers: [(CLLocation, Double) -> Void] = []
+    //The last route coordinates loaded from Core Data
+    private(set) var recentCoordinates: [CLLocationCoordinate2D] = []
+    //Optional error handler closure
     var onError: ((Error) -> Void)?
     private(set) var totalDistance: CLLocationDistance = 0
+    //A date used to ignore updates immediately after stopping tracking, to avoid spikes
     private var ignoreUpdatesAfterStopUntil: Date?
+    //The most recent location received
     private(set) var lastLocation: CLLocation?
+    //Flag indicating if tracking is currently active
     private var isTracking = false
+    //Current authorization status for location services
     private(set) var authorizationStatus: CLAuthorizationStatus = .notDetermined {
         didSet {
             onAuthorizationChanged?(authorizationStatus)
         }
     }
-
+    //Singleton
     static let shared = LocationService()
+    //Closure to notify observers when location authorization changes
     var onAuthorizationChanged: ((CLAuthorizationStatus) -> Void)?
 
 
@@ -35,7 +44,7 @@ final class LocationService: NSObject {
         locationManager.pausesLocationUpdatesAutomatically = false
         locationManager.activityType = .fitness
     }
-
+    //requesting authorization
     func requestAuthorization() {
         let status = locationManager.authorizationStatus
         switch status {
@@ -49,11 +58,12 @@ final class LocationService: NSObject {
             break
         }
     }
-
+    //Start of service
     func start() {
         isTracking = true
         ignoreUpdatesAfterStopUntil = nil
         LocationTracker.shared.clearSpeedSamples()
+        loadRecentRouteFromCoreData()
         locationManager.startUpdatingLocation()
 
         if
@@ -66,14 +76,14 @@ final class LocationService: NSObject {
             locationManager.requestLocation()
         }
     }
-
+    //Stop of service
     func stop() {
         isTracking = false
         LocationTracker.shared.clearSpeedSamples()
         ignoreUpdatesAfterStopUntil = Date().addingTimeInterval(5)
         locationManager.stopUpdatingLocation()
     }
-
+    //Allows continuous subscribers to receive updates
     func subscribe(_ handler: @escaping (CLLocation, Double) -> Void) {
         subscribers.append(handler)
         if let last = lastLocation {
@@ -81,7 +91,7 @@ final class LocationService: NSObject {
             handler(last, displayedSpeed)
         }
     }
-
+    //requesting location(map)
     func requestCurrentLocation(completion: @escaping (CLLocation) -> Void) {
         if let cached = locationManager.location {
             completion(cached)
@@ -89,17 +99,27 @@ final class LocationService: NSObject {
         oneTimeRequests.append(completion)
         locationManager.requestLocation()
     }
-
+    //notifying subscribers about stop(speed 0)
     private func notifySubscribersWithZeroSpeed() {
         if let lastLoc = lastLocation {
             notifySubscribers(with: lastLoc, speed: 0.0)
         }
+    }
+    //saving recent coordinated to CD and updating recentCoordinates
+    private func updateRecentCoordinates(with newLocation: CLLocation) {
+        CoreDataManager.shared.saveRoutePoint(from: newLocation)
+        loadRecentRouteFromCoreData()
+    }
+    //updating recentCoordinates for last 1 km
+    func loadRecentRouteFromCoreData() {
+        recentCoordinates = CoreDataManager.shared.fetchRoutePointsForLast(distance: 1000)
     }
 }
 
 // MARK: CLLocationManagerDelegate
 
 extension LocationService: CLLocationManagerDelegate {
+    //Main handler for location updates, processes new locations with several validation checks
     func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let newLocation = locations.last else { return }
         guard let last = lastLocation else {
@@ -126,13 +146,15 @@ extension LocationService: CLLocationManagerDelegate {
         if isSpeedValid && isDistanceValid {
             updateDistanceIfNeeded(from: lastLocation, to: newLocation, distance: distance, speed: averagedSpeed)
             lastLocation = newLocation
+            updateRecentCoordinates(with: newLocation)
+            CoreDataManager.shared.saveRoutePoint(from: newLocation)
             notifySubscribers(with: newLocation, speed: averagedSpeed)
         } else {
             lastLocation = newLocation
             notifySubscribersWithZeroSpeed()
         }
     }
-
+    //Validates location accuracy and timestamp
     private func shouldIgnoreLocation(_ location: CLLocation) -> Bool {
         guard location.horizontalAccuracy >= 0 && location.horizontalAccuracy < 20 else {
             return true
@@ -153,7 +175,7 @@ extension LocationService: CLLocationManagerDelegate {
         return false
     }
 
-
+    //Updates total distance traveled
     private func updateDistanceIfNeeded(from last: CLLocation?, to current: CLLocation, distance: CLLocationDistance, speed: Double) {
         guard let last = last else { return }
 
@@ -171,7 +193,7 @@ extension LocationService: CLLocationManagerDelegate {
             }
         }
     }
-
+    //Notifies registered subscribers about location/speed updates
     private func notifySubscribers(with location: CLLocation, speed: Double) {
         let displayedSpeed = speed.isNaN || speed < 0.1 ? 0.0 : speed
         lastLocation = location
@@ -179,11 +201,11 @@ extension LocationService: CLLocationManagerDelegate {
         oneTimeRequests.forEach { $0(location) }
         oneTimeRequests.removeAll()
     }
-
+    //Handles location tracking errors
     func locationManager(_: CLLocationManager, didFailWithError error: Error) {
         onError?(error)
     }
-
+    //Responds to authorization status changes
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus
         authorizationStatus = status

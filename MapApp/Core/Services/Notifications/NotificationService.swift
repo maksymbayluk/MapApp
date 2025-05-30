@@ -9,11 +9,12 @@ import CoreLocation
 import UIKit
 import UserNotifications
 
+//Singleton class that handles local notifications
 final class NotificationService {
     static let shared = NotificationService()
 
     private init() {}
-
+    //Requests basic notification permissions (alerts and sounds)
     func requestPermission() {
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .sound]) { _, error in
@@ -22,7 +23,7 @@ final class NotificationService {
             }
         }
     }
-
+    //Creates customized notification content(notification with custom sound)
     func sendDistanceNotification(distance: CLLocationDistance) {
         let content = UNMutableNotificationContent()
         content.title = "Distance Update"

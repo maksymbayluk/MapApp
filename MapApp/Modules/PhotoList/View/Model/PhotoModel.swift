@@ -6,6 +6,7 @@
 //
 import Foundation
 
+//model representing a photo object fetched from a remote API
 struct Photo: Decodable, Identifiable {
     let id: String
     let download_url: URL

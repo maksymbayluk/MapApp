@@ -6,12 +6,14 @@
 //
 import Foundation
 
-
+//Represents an endpoint to fetch a list of photos(items on list vc)
 enum PhotoEndpoint {
+    
     case photos(page: Int, limit: Int)
 
     private static let baseURL = URL(string: "https://picsum.photos")!
-
+    
+    //Making url - computed property
     var url: URL? {
         switch self {
         case let .photos(page, limit):
@@ -23,7 +25,8 @@ enum PhotoEndpoint {
             return components?.url
         }
     }
-
+    
+    //Returning url request
     func urlRequest() throws -> URLRequest {
         guard let url = url else {
             throw NetworkError.invalidURL

@@ -7,12 +7,13 @@
 import UIKit
 
 // MARK: - PhotoListViewController
-
+//class that displays a list of photos using view models, supports pagination, and handles loading states and errors (like no internet)
 class PhotoListViewController: UITableViewController {
-
+    //The main view model responsible for providing data and triggering UI updates
     var viewModel: PhotoListViewModel?
+    //Internal cache of photo cell view models used to configure cells
     private var photoViewModels: [PhotoCellViewModel] = []
-
+    //lifecycle
     init() {
         super.init(style: .insetGrouped)
     }
@@ -26,11 +27,12 @@ class PhotoListViewController: UITableViewController {
         title = "List"
         configureTableView()
         bindViewModel()
+        //Triggers initial data load via viewModel.loadNextPage()
         Task {
             await self.viewModel?.loadNextPage()
         }
     }
-
+    //config of table view
     func configureTableView() {
         let nib = UINib(nibName: "PhotoTableViewCell", bundle: nil)
         tableView.register(nib, forCellReuseIdentifier: "PhotoCell")
@@ -39,7 +41,7 @@ class PhotoListViewController: UITableViewController {
         tableView.estimatedRowHeight = 80
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "LoadingCell")
     }
-
+    //Attaches three closures
     private func bindViewModel() {
         viewModel?.onUpdate = { [weak self] in
             self?.photoViewModels = self?.viewModel?.photos.map { PhotoCellViewModel(photo: $0) } ?? []
@@ -68,7 +70,7 @@ class PhotoListViewController: UITableViewController {
             }
         }
     }
-
+    //table view delegate and data source
     override func numberOfSections(in _: UITableView) -> Int {
         return photoViewModels.count
     }
@@ -98,7 +100,7 @@ class PhotoListViewController: UITableViewController {
         view.backgroundColor = .clear
         return view
     }
-
+    //Returns a loading spinner view to be used as tableFooterView during pagination loading
     private func createSpinnerFooter() -> UIView {
         let footerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 50))
         let spinner = UIActivityIndicatorView(style: .medium)
@@ -107,7 +109,7 @@ class PhotoListViewController: UITableViewController {
         footerView.addSubview(spinner)
         return footerView
     }
-
+    //Shows or hides a red label at the top of the table for connectivity issues
     private func NoInternetMessage(shown: Bool) {
         let label = UILabel()
         label.text = "No Internet Connection"
@@ -121,6 +123,7 @@ class PhotoListViewController: UITableViewController {
 }
 
 extension PhotoListViewController {
+    //Detects if an error is a known network-related error
     private func isInternetError(_ error: Error) -> Bool {
         let nsError = error as NSError
         let networkErrorCodes: [Int] = [

@@ -7,6 +7,7 @@
 import AVKit
 import Foundation
 
+//singleton to simplify triggering haptics feedback
 class HapticManager {
 
     static let shared = HapticManager()

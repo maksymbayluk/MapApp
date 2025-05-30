@@ -5,6 +5,7 @@
 //  Created by Максим Байлюк on 27.05.2025.
 //
 
+//enum representing the items in side menu
 enum SideMenuOption: CaseIterable {
     case map
     case list

@@ -7,6 +7,7 @@
 import Foundation
 import UIKit
 
+//view model for use in table view cell
 struct PhotoCellViewModel {
     let idText: String
     let title: String
@@ -17,11 +18,12 @@ struct PhotoCellViewModel {
         title = photo.title
         imageURL = photo.thumbnailUrl
     }
-
+    //Asynchronously loads and caches a thumbnail image
     func loadImage() async -> UIImage? {
+        //returns a placeholder system image if image url is nil
         let placeholder = UIImage(systemName: "photo")
         guard let url = imageURL else { return placeholder }
-
+        //If not cached, downloads the image with URLSession
         if let cachedImage = ImageCache.shared.object(forKey: url as NSURL) {
             return cachedImage
         }
