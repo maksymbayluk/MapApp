@@ -14,13 +14,14 @@ final class AppCoordinator {
     init(window: UIWindow) {
         self.window = window
     }
-
+    //Start of the navigation and requesting permissions
     func start() {
         let navController = UINavigationController()
         window.rootViewController = navController
         window.makeKeyAndVisible()
-        let locationService = LocationService()
+        let locationService = LocationService.shared
         locationService.requestAuthorization()
+        NotificationService.shared.requestPermission()
 
         mainCoordinator = MainCoordinator(navigationController: navController, locationService: locationService)
         mainCoordinator?.start()

@@ -8,19 +8,25 @@
 import UIKit
 
 // MARK: - SideMenuContainerDelegate
-
+//protocol fo
 protocol SideMenuContainerDelegate: AnyObject {
     func didSelectMenuOption(_ option: SideMenuOption)
 }
 
 // MARK: - SideMenuViewController
-
+//class designed to display a side menu list
 class SideMenuViewController: UIViewController {
+    //holds the logo image, styled with shadows and rounded corners
     @IBOutlet weak var logoImageContainer: UIView!
+    //Displays a circular logo image
     @IBOutlet weak var logoImageView: UIImageView!
+    //Shows a text about the app
     @IBOutlet weak var titleLabel: UILabel!
+    //Lists the menu options
     @IBOutlet weak var tableView: UITableView!
+    //constaint to adjust the height of the tv based on content
     @IBOutlet weak var table_view_height: NSLayoutConstraint!
+    //supplies the menu options
     var viewModel: SideMenuViewModel!
 
     init() {
@@ -30,7 +36,7 @@ class SideMenuViewController: UIViewController {
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    //lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -47,7 +53,7 @@ class SideMenuViewController: UIViewController {
         super.viewWillDisappear(animated)
         tableView.removeObserver(self, forKeyPath: "contentSize")
     }
-
+    //adding shadows and other UI
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         logoImageView.layer.cornerRadius = logoImageView.bounds.width / 2
@@ -61,7 +67,7 @@ class SideMenuViewController: UIViewController {
         logoImageContainer.layer.cornerRadius = logoImageContainer.bounds.width / 2
         logoImageContainer.layer.masksToBounds = false
     }
-
+    //observing height of the table view
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?) {
         if keyPath == "contentSize" {
             if let tbl = object as? UITableView, tbl == tableView, let newValue = change?[.newKey] as? CGSize {
@@ -70,7 +76,7 @@ class SideMenuViewController: UIViewController {
             }
         }
     }
-
+    //configuring the UI
     private func setupUI() {
         titleLabel.text = "My app helps users navigate, explore new locations, track their routes, and discover interesting places with interactive, real-time maps"
         tableView.dataSource = self
@@ -79,7 +85,7 @@ class SideMenuViewController: UIViewController {
         tableView.isScrollEnabled = false
         tableView.reloadData()
     }
-
+    //setting logo image
     func setLogo() {
         if let image = UIImage(named: "map") {
             logoImageView.image = image
@@ -87,8 +93,7 @@ class SideMenuViewController: UIViewController {
     }
 }
 
-// MARK: UITableViewDataSource, UITableViewDelegate
-
+//datasource and delegate of the table view
 extension SideMenuViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
         return viewModel.options.count

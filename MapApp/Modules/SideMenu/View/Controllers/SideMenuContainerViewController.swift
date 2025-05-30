@@ -6,15 +6,21 @@
 //
 import UIKit
 
-
+//class that displays the main screen, hosts a hidden side menu, handles user interaction on menu button
 class SideMenuContainerViewController: UIViewController {
-
+    //width of side menu(70 % of the screen)
     private let sideMenuWidth: CGFloat = UIScreen.main.bounds.width * 0.7
+    //tracks when side menu is open
     private var isMenuOpen = false
+    //The view controller for the side menu
     private let sideMenuVC: SideMenuViewController
+    //default vc(map)
     private let mainMapViewController: MainMapViewController
+    //currently displayed vc
     private var currentContentVC: UIViewController!
+    //notifies when a menu option selected
     weak var delegate: SideMenuContainerDelegate?
+    //A semi-transparent black overlay
     private let dimmedView = UIView()
 
     init(mainMapViewController: MainMapViewController, sideMenuViewController: SideMenuViewController) {
@@ -27,7 +33,7 @@ class SideMenuContainerViewController: UIViewController {
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    //lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -35,7 +41,7 @@ class SideMenuContainerViewController: UIViewController {
         setupGestures(for: mainMapViewController)
         setupDimmedView(on: mainMapViewController)
     }
-
+    //setting the UI
     func setupUI() {
         title = "Map"
         navigationItem.leftBarButtonItem = UIBarButtonItem(
@@ -45,7 +51,7 @@ class SideMenuContainerViewController: UIViewController {
             action: #selector(toggleMenu)
         )
     }
-
+    //embeds the side menu, adds map as main, connects callbacks for menu options
     private func setupChildVCs() {
         addChild(sideMenuVC)
         sideMenuVC.view.frame = CGRect(x: -sideMenuWidth, y: 0, width: sideMenuWidth, height: view.frame.height)
@@ -67,7 +73,7 @@ class SideMenuContainerViewController: UIViewController {
             self?.handleMenuOption(option)
         }
     }
-
+    //replaces the current vc with a new one
     func setContentViewController(_ newVC: UIViewController) {
         if let current = currentContentVC {
             current.willMove(toParent: nil)
@@ -89,7 +95,7 @@ class SideMenuContainerViewController: UIViewController {
         dimmedView.frame = newVC.view.bounds
         newVC.view.addSubview(dimmedView)
     }
-
+    //setting dimmed view
     private func setupDimmedView(on vc: UIViewController) {
         dimmedView.frame = vc.view.bounds
         dimmedView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
@@ -99,7 +105,7 @@ class SideMenuContainerViewController: UIViewController {
         let tap = UITapGestureRecognizer(target: self, action: #selector(toggleMenu))
         dimmedView.addGestureRecognizer(tap)
     }
-
+    //setting gestures
     private func setupGestures(for vc: UIViewController) {
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeGesture(_:)))
         swipeRight.direction = .right
@@ -109,7 +115,7 @@ class SideMenuContainerViewController: UIViewController {
         swipeLeft.direction = .left
         vc.view.addGestureRecognizer(swipeLeft)
     }
-
+    //objc func of gestures
     @objc private func handleSwipeGesture(_ gesture: UISwipeGestureRecognizer) {
         switch gesture.direction {
         case .right:
@@ -124,7 +130,7 @@ class SideMenuContainerViewController: UIViewController {
             break
         }
     }
-
+    //animates the menu sliding in and out
     @objc private func toggleMenu() {
         isMenuOpen.toggle()
 
@@ -138,7 +144,7 @@ class SideMenuContainerViewController: UIViewController {
             self.dimmedView.alpha = dimmedAlpha
         })
     }
-
+    //called when side menu item is selected
     private func handleMenuOption(_ option: SideMenuOption) {
         toggleMenu()
         delegate?.didSelectMenuOption(option)
